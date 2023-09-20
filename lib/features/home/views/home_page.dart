@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tech_task/features/home/home.dart';
-import 'package:tech_task/features/home/views/ingredients_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -23,67 +22,94 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // ref.listen<IngredientState>(ingredientStateProvider, (prev, state) {
-    //   if (!state.loading &&
-    //       prev?.ingredients == null &&
-    //       state.ingredients != null) {
-
-    //       }
-    // });
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Recipes'),
       ),
-      body: Container(
-        child: Center(
-          child: !ref.watch(ingredientStateProvider).loading
-              ? TextButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Colors.black)),
-                  onPressed: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: now,
-                      firstDate: DateTime(2018, now.month, now.day),
-                      lastDate: DateTime(now.year + 1, now.month, now.day),
-                    );
+      body: !ref.watch(ingredientStateProvider).error
+          ? Container(
+              child: Center(
+                child: !ref.watch(ingredientStateProvider).loading
+                    ? TextButton(
+                        key: Key('date-button'),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.black),
+                          padding: MaterialStatePropertyAll(EdgeInsets.all(16)),
+                        ),
+                        onPressed: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: now,
+                            firstDate: DateTime(2018, now.month, now.day),
+                            lastDate:
+                                DateTime(now.year + 1, now.month, now.day),
+                          );
 
-                    ref
-                        .read(ingredientStateProvider.notifier)
-                        .selectDate(date ?? now);
-                    await ref
-                        .read(ingredientStateProvider.notifier)
-                        .getIngredients()
-                        .then(
-                      (value) {
-                        print(ref.read(ingredientStateProvider).ingredients);
-
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => IngredientsPage(
-                              ingredients: ref
-                                      .read(ingredientStateProvider)
-                                      .ingredients ??
-                                  [],
-                            ),
+                          ref
+                              .read(ingredientStateProvider.notifier)
+                              .selectDate(date ?? now);
+                          ref
+                              .read(ingredientStateProvider.notifier)
+                              .getIngredients()
+                              .then(
+                            (value) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => IngredientsPage(
+                                    ingredients: ref
+                                            .read(ingredientStateProvider)
+                                            .ingredients ??
+                                        [],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Text(
+                          'Select Date',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.white,
                           ),
-                        );
-                      },
-                    );
-                  },
-                  child: Text(
-                    'Select Date',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
+                        ),
+                      )
+                    : CircularProgressIndicator(),
+              ),
+            )
+          : Center(
+              child: Column(
+                children: [
+                  Text(ref.watch(ingredientStateProvider).errorText ??
+                      'An error occured'),
+                  SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(ingredientStateProvider.notifier)
+                          .getIngredients()
+                          .then(
+                        (value) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => IngredientsPage(
+                                ingredients: ref
+                                        .read(ingredientStateProvider)
+                                        .ingredients ??
+                                    [],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text('Retry'),
                   ),
-                )
-              : CircularProgressIndicator(),
-        ),
-      ),
+                ],
+              ),
+            ),
     );
   }
 }

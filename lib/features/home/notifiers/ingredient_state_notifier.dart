@@ -56,7 +56,10 @@ class IngredientStateNotifier extends StateNotifier<IngredientState> {
 
   Future<void> getIngredients() async {
     try {
-      state = state.copyWith(loading: true);
+      state = state.copyWith(
+        loading: true,
+        error: false,
+      );
       final ingredients = await _ingredientRepository.getIngredients();
       state = state.copyWith(
         loading: false,
@@ -79,7 +82,10 @@ class IngredientStateNotifier extends StateNotifier<IngredientState> {
 
   Future<void> getRecipes() async {
     try {
-      state = state.copyWith(loading: true);
+      state = state.copyWith(
+        loading: true,
+        error: false,
+      );
       final recipes =
           await _recipeRepository.getRecipies(state.selectedIngredients ?? []);
       state = state.copyWith(

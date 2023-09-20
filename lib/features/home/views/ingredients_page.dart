@@ -38,7 +38,7 @@ class IngredientsPage extends ConsumerWidget {
                     },
                   ),
                 )
-              : CircularProgressIndicator(),
+              : Center(child: CircularProgressIndicator()),
           ElevatedButton(
             style: ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll(Colors.black)),

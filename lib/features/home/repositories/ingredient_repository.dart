@@ -7,7 +7,7 @@ final ingredientRepoProvider = Provider<IngredientRepository>((ref) {
 });
 
 abstract class IngredientRepository {
-  Future<List<Ingredient>?> getIngredients();
+  Future<List<Ingredient>> getIngredients();
 }
 
 class IngredientRepositoryImpl implements IngredientRepository {
@@ -15,9 +15,10 @@ class IngredientRepositoryImpl implements IngredientRepository {
   final IngredientDataSource _dataSource;
 
   @override
-  Future<List<Ingredient>?> getIngredients() async {
+  Future<List<Ingredient>> getIngredients() async {
     try {
-      return _dataSource.getIngredients();
+      final ingredients = await _dataSource.getIngredients();
+      return ingredients ?? [];
     } catch (e) {
       rethrow;
     }
